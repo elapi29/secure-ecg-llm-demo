@@ -4,10 +4,9 @@ Rust + WebAssembly MVP for signed and encrypted ECG metadata, designed for secur
 
 ## Screenshot
 
-![secure-ecg-llm-demo](docs/secure-ecg-llm-demo_1.png)
-![secure-ecg-llm-demo](docs/secure-ecg-llm-demo_2.png)
-![secure-ecg-llm-demo](docs/secure-ecg-llm-demo_3.png)
-
+![secure-ecg-llm-demo-1](docs/secure-ecg-demo-llm_1.png)
+![secure-ecg-llm-demo-2](docs/secure-ecg-demo-llm_2.png)
+![secure-ecg-llm-demo-3](docs/secure-ecg-demo-llm_3.png)
 
 ## Overview
 
