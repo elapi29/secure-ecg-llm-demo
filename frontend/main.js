@@ -55,14 +55,96 @@ const metadataEl = document.getElementById("metadata");
 const passphraseEl = document.getElementById("passphrase");
 const protectedOutputEl = document.getElementById("protectedOutput");
 const serverOutputEl = document.getElementById("serverOutput");
+
 const loadSampleBtn = document.getElementById("loadSampleBtn");
 const protectBtn = document.getElementById("protectBtn");
 const sendBtn = document.getElementById("sendBtn");
 
+const summaryModalityEl = document.getElementById("summaryModality");
+const summaryManufacturerEl = document.getElementById("summaryManufacturer");
+const summaryMultiplexesEl = document.getElementById("summaryMultiplexes");
+const summaryChannelsEl = document.getElementById("summaryChannels");
+
+const localSignatureStatusEl = document.getElementById("localSignatureStatus");
+const localPreviewStatusEl = document.getElementById("localPreviewStatus");
+const backendVerificationStatusEl = document.getElementById("backendVerificationStatus");
+const backendPayloadStatusEl = document.getElementById("backendPayloadStatus");
+
+const stepLoadedEl = document.getElementById("stepLoaded");
+const stepProtectedEl = document.getElementById("stepProtected");
+const stepVerifiedEl = document.getElementById("stepVerified");
+
 let currentEnvelope = null;
 
+function setStepState(stepEl, active, text) {
+  stepEl.classList.toggle("active", active);
+  const stateEl = stepEl.querySelector(".step-state");
+  stateEl.textContent = text;
+}
+
+function updateSummaryFromMetadata(obj) {
+  summaryModalityEl.textContent = obj?.modality ?? "—";
+  summaryManufacturerEl.textContent = obj?.manufacturer ?? "—";
+  summaryMultiplexesEl.textContent = obj?.multiplex_count ?? "—";
+
+  const firstMultiplex = Array.isArray(obj?.multiplexes) && obj.multiplexes.length > 0
+    ? obj.multiplexes[0]
+    : null;
+
+  summaryChannelsEl.textContent = firstMultiplex?.channels ?? "—";
+}
+
+function parseCurrentMetadata() {
+  const raw = metadataEl.value.trim();
+  if (!raw) return null;
+  return JSON.parse(raw);
+}
+
+function resetProtectionState() {
+  currentEnvelope = null;
+  protectedOutputEl.textContent = "Nothing yet.";
+  serverOutputEl.textContent = "Nothing yet.";
+
+  localSignatureStatusEl.textContent = "Not run";
+  localPreviewStatusEl.textContent = "Not available";
+  backendVerificationStatusEl.textContent = "Not run";
+  backendPayloadStatusEl.textContent = "Not available";
+
+  setStepState(stepProtectedEl, false, "Waiting");
+  setStepState(stepVerifiedEl, false, "Waiting");
+}
+
+function loadMetadataObject(obj) {
+  metadataEl.value = JSON.stringify(obj, null, 2);
+  updateSummaryFromMetadata(obj);
+
+  setStepState(stepLoadedEl, true, "Ready");
+  resetProtectionState();
+}
+
+metadataEl.addEventListener("input", () => {
+  try {
+    const obj = parseCurrentMetadata();
+    if (obj) {
+      updateSummaryFromMetadata(obj);
+      setStepState(stepLoadedEl, true, "Ready");
+    } else {
+      updateSummaryFromMetadata({});
+      setStepState(stepLoadedEl, false, "Waiting");
+    }
+    resetProtectionState();
+  } catch {
+    setStepState(stepLoadedEl, false, "Invalid JSON");
+    summaryModalityEl.textContent = "—";
+    summaryManufacturerEl.textContent = "—";
+    summaryMultiplexesEl.textContent = "—";
+    summaryChannelsEl.textContent = "—";
+    resetProtectionState();
+  }
+});
+
 loadSampleBtn.addEventListener("click", () => {
-  metadataEl.value = JSON.stringify(sampleMetadata, null, 2);
+  loadMetadataObject(sampleMetadata);
 });
 
 protectBtn.addEventListener("click", async () => {
@@ -91,11 +173,17 @@ protectBtn.addEventListener("click", async () => {
       passphraseEl.value
     );
 
+    const decryptedObj = JSON.parse(decrypted);
+
+    localSignatureStatusEl.textContent = verified ? "Valid" : "Invalid";
+    localPreviewStatusEl.textContent = decryptedObj?.modality ? "Recovered" : "Unavailable";
+
+    setStepState(stepProtectedEl, true, verified ? "Protected" : "Protection issue");
     serverOutputEl.textContent = JSON.stringify(
       {
         local_check: {
           signature_valid: verified,
-          decrypted_preview: JSON.parse(decrypted)
+          decrypted_preview: decryptedObj
         }
       },
       null,
@@ -103,14 +191,18 @@ protectBtn.addEventListener("click", async () => {
     );
   } catch (err) {
     console.error(err);
+    currentEnvelope = null;
     protectedOutputEl.textContent = "Nothing yet.";
     serverOutputEl.textContent = `Protect error: ${err}`;
+    localSignatureStatusEl.textContent = "Error";
+    localPreviewStatusEl.textContent = "Unavailable";
+    setStepState(stepProtectedEl, false, "Error");
   }
 });
 
 sendBtn.addEventListener("click", async () => {
   if (!currentEnvelope) {
-    serverOutputEl.textContent = "First click: Sign + encrypt";
+    serverOutputEl.textContent = "First click: Protect metadata";
     return;
   }
 
@@ -127,21 +219,36 @@ sendBtn.addEventListener("click", async () => {
 
     if (!resp.ok) {
       serverOutputEl.textContent = `HTTP ${resp.status}\n${text}`;
+      backendVerificationStatusEl.textContent = "Failed";
+      backendPayloadStatusEl.textContent = "Unavailable";
+      setStepState(stepVerifiedEl, false, "Error");
       return;
     }
 
     const data = JSON.parse(text);
     serverOutputEl.textContent = JSON.stringify(data, null, 2);
+
+    backendVerificationStatusEl.textContent = data.signature_valid ? "Valid" : "Invalid";
+    backendPayloadStatusEl.textContent = data.decrypted_payload ? "Recovered" : "Unavailable";
+
+    setStepState(
+      stepVerifiedEl,
+      true,
+      data.signature_valid ? "Verified" : "Verification issue"
+    );
   } catch (err) {
     console.error(err);
     serverOutputEl.textContent = `Send error: ${err}`;
+    backendVerificationStatusEl.textContent = "Error";
+    backendPayloadStatusEl.textContent = "Unavailable";
+    setStepState(stepVerifiedEl, false, "Error");
   }
 });
 
 (async function boot() {
   try {
     await init();
-    metadataEl.value = JSON.stringify(sampleMetadata, null, 2);
+    loadMetadataObject(sampleMetadata);
     protectedOutputEl.textContent = "WASM ready.";
     serverOutputEl.textContent = "Server not contacted yet.";
   } catch (err) {
