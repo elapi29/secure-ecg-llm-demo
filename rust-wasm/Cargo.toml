@@ -1,0 +1,21 @@
+[package]
+name = "secure_ecg_crypto"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+chacha20poly1305 = { version = "0.10", default-features = false, features = ["alloc"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+base64 = "0.22"
+sha2 = "0.10"
+ed25519-dalek = { version = "1.0.1", default-features = false, features = ["serde"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2.17", features = ["js"] }
+curve25519-dalek = { version = "3.2.0", default-features = false, features = ["u32_backend"] }
