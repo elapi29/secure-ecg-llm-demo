@@ -70,37 +70,26 @@ const localPreviewStatusEl = document.getElementById("localPreviewStatus");
 const backendVerificationStatusEl = document.getElementById("backendVerificationStatus");
 const backendPayloadStatusEl = document.getElementById("backendPayloadStatus");
 
-const stepLoadedEl = document.getElementById("stepLoaded");
-const stepProtectedEl = document.getElementById("stepProtected");
-const stepVerifiedEl = document.getElementById("stepVerified");
+const stepLoadedStateEl = document.getElementById("stepLoadedState");
+const stepProtectedStateEl = document.getElementById("stepProtectedState");
+const stepVerifiedStateEl = document.getElementById("stepVerifiedState");
 
 let currentEnvelope = null;
-
-function setStepState(stepEl, active, text) {
-  stepEl.classList.toggle("active", active);
-  const stateEl = stepEl.querySelector(".step-state");
-  stateEl.textContent = text;
-}
 
 function updateSummaryFromMetadata(obj) {
   summaryModalityEl.textContent = obj?.modality ?? "—";
   summaryManufacturerEl.textContent = obj?.manufacturer ?? "—";
   summaryMultiplexesEl.textContent = obj?.multiplex_count ?? "—";
 
-  const firstMultiplex = Array.isArray(obj?.multiplexes) && obj.multiplexes.length > 0
-    ? obj.multiplexes[0]
-    : null;
+  const firstMultiplex =
+    Array.isArray(obj?.multiplexes) && obj.multiplexes.length > 0
+      ? obj.multiplexes[0]
+      : null;
 
   summaryChannelsEl.textContent = firstMultiplex?.channels ?? "—";
 }
 
-function parseCurrentMetadata() {
-  const raw = metadataEl.value.trim();
-  if (!raw) return null;
-  return JSON.parse(raw);
-}
-
-function resetProtectionState() {
+function resetState() {
   currentEnvelope = null;
   protectedOutputEl.textContent = "Nothing yet.";
   serverOutputEl.textContent = "Nothing yet.";
@@ -110,36 +99,35 @@ function resetProtectionState() {
   backendVerificationStatusEl.textContent = "Not run";
   backendPayloadStatusEl.textContent = "Not available";
 
-  setStepState(stepProtectedEl, false, "Waiting");
-  setStepState(stepVerifiedEl, false, "Waiting");
+  stepProtectedStateEl.textContent = "Waiting";
+  stepVerifiedStateEl.textContent = "Waiting";
 }
 
 function loadMetadataObject(obj) {
   metadataEl.value = JSON.stringify(obj, null, 2);
   updateSummaryFromMetadata(obj);
-
-  setStepState(stepLoadedEl, true, "Ready");
-  resetProtectionState();
+  stepLoadedStateEl.textContent = "Ready";
+  resetState();
 }
 
 metadataEl.addEventListener("input", () => {
   try {
-    const obj = parseCurrentMetadata();
-    if (obj) {
-      updateSummaryFromMetadata(obj);
-      setStepState(stepLoadedEl, true, "Ready");
-    } else {
+    const raw = metadataEl.value.trim();
+    if (!raw) {
       updateSummaryFromMetadata({});
-      setStepState(stepLoadedEl, false, "Waiting");
+      stepLoadedStateEl.textContent = "Waiting";
+      resetState();
+      return;
     }
-    resetProtectionState();
+
+    const obj = JSON.parse(raw);
+    updateSummaryFromMetadata(obj);
+    stepLoadedStateEl.textContent = "Ready";
+    resetState();
   } catch {
-    setStepState(stepLoadedEl, false, "Invalid JSON");
-    summaryModalityEl.textContent = "—";
-    summaryManufacturerEl.textContent = "—";
-    summaryMultiplexesEl.textContent = "—";
-    summaryChannelsEl.textContent = "—";
-    resetProtectionState();
+    updateSummaryFromMetadata({});
+    stepLoadedStateEl.textContent = "Invalid JSON";
+    resetState();
   }
 });
 
@@ -147,10 +135,9 @@ loadSampleBtn.addEventListener("click", () => {
   loadMetadataObject(sampleMetadata);
 });
 
-protectBtn.addEventListener("click", async () => {
+protectBtn.addEventListener("click", () => {
   try {
     const payload = metadataEl.value.trim();
-
     if (!payload) {
       serverOutputEl.textContent = "No metadata JSON provided.";
       return;
@@ -177,8 +164,8 @@ protectBtn.addEventListener("click", async () => {
 
     localSignatureStatusEl.textContent = verified ? "Valid" : "Invalid";
     localPreviewStatusEl.textContent = decryptedObj?.modality ? "Recovered" : "Unavailable";
+    stepProtectedStateEl.textContent = verified ? "Protected" : "Issue";
 
-    setStepState(stepProtectedEl, true, verified ? "Protected" : "Protection issue");
     serverOutputEl.textContent = JSON.stringify(
       {
         local_check: {
@@ -196,7 +183,7 @@ protectBtn.addEventListener("click", async () => {
     serverOutputEl.textContent = `Protect error: ${err}`;
     localSignatureStatusEl.textContent = "Error";
     localPreviewStatusEl.textContent = "Unavailable";
-    setStepState(stepProtectedEl, false, "Error");
+    stepProtectedStateEl.textContent = "Error";
   }
 });
 
@@ -221,7 +208,7 @@ sendBtn.addEventListener("click", async () => {
       serverOutputEl.textContent = `HTTP ${resp.status}\n${text}`;
       backendVerificationStatusEl.textContent = "Failed";
       backendPayloadStatusEl.textContent = "Unavailable";
-      setStepState(stepVerifiedEl, false, "Error");
+      stepVerifiedStateEl.textContent = "Error";
       return;
     }
 
@@ -230,18 +217,13 @@ sendBtn.addEventListener("click", async () => {
 
     backendVerificationStatusEl.textContent = data.signature_valid ? "Valid" : "Invalid";
     backendPayloadStatusEl.textContent = data.decrypted_payload ? "Recovered" : "Unavailable";
-
-    setStepState(
-      stepVerifiedEl,
-      true,
-      data.signature_valid ? "Verified" : "Verification issue"
-    );
+    stepVerifiedStateEl.textContent = data.signature_valid ? "Verified" : "Issue";
   } catch (err) {
     console.error(err);
     serverOutputEl.textContent = `Send error: ${err}`;
     backendVerificationStatusEl.textContent = "Error";
     backendPayloadStatusEl.textContent = "Unavailable";
-    setStepState(stepVerifiedEl, false, "Error");
+    stepVerifiedStateEl.textContent = "Error";
   }
 });
 

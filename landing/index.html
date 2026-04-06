@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure ECG Metadata | Landing</title>
+  <meta
+    name="description"
+    content="Secure clinical metadata before AI ingestion. A lightweight healthtech MVP for protected metadata workflows."
+  />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="brand">secure-ecg-llm-demo</div>
+      <nav class="nav-links">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#use-cases">Use cases</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">Rust + WebAssembly + secure metadata workflows</div>
+          <h1>Protect sensitive clinical metadata before it reaches AI systems</h1>
+          <p class="hero-text">
+            A lightweight MVP that shows how ECG-related metadata can be protected locally,
+            verified in a backend, and recovered as structured payloads for downstream workflows.
+          </p>
+
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#contact">Let’s build secure pipelines</a>
+            <a class="btn btn-secondary" href="#solution">View architecture</a>
+          </div>
+
+          <div class="hero-badges">
+            <span>Browser-side signing</span>
+            <span>Browser-side encryption</span>
+            <span>Backend verification</span>
+            <span>Structured recovery</span>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div class="mini-label">Workflow</div>
+          <div class="flow-step">Load metadata</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step">Protect locally</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step">Verify in backend</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step success">Recover structured payload</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="problem">
+      <div class="container">
+        <div class="section-heading">
+          <div class="eyebrow">Problem</div>
+          <h2>Raw metadata handoffs create risk</h2>
+          <p>
+            In healthtech and clinical AI workflows, sensitive metadata often moves into downstream
+            systems with too little control, too little visibility, and too little protection.
+          </p>
+        </div>
+
+        <div class="cards three">
+          <article class="card">
+            <h3>Weak control</h3>
+            <p>
+              Metadata can be passed between systems as a raw handoff, without enough protection
+              before reaching tools, agents, or AI pipelines.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Limited traceability</h3>
+            <p>
+              Teams need more confidence in what was sent, what was verified, and what was recovered
+              before data moves downstream.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Security concerns</h3>
+            <p>
+              Clinical and biosignal workflows increasingly need security-aware handling from the
+              first step, not only at the very end.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="solution">
+      <div class="container">
+        <div class="section-heading">
+          <div class="eyebrow">Solution</div>
+          <h2>A secure ingestion layer for clinical metadata</h2>
+          <p>
+            This MVP demonstrates a simple but important idea: protect metadata before downstream
+            processing, then verify and recover it in a controlled backend workflow.
+          </p>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-number">1</div>
+            <div>
+              <h3>Sign in browser</h3>
+              <p>Establish authenticity before metadata leaves the client side.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-number">2</div>
+            <div>
+              <h3>Encrypt in browser</h3>
+              <p>Protect metadata before transmission to downstream systems.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-number">3</div>
+            <div>
+              <h3>Verify in backend</h3>
+              <p>Confirm the package before accepting it into the workflow.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-number">4</div>
+            <div>
+              <h3>Recover structured payload</h3>
+              <p>Return usable metadata for tools, applications, or AI pipelines.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cards two architecture-summary">
+          <article class="card">
+            <h3>What this MVP already shows</h3>
+            <ul>
+              <li>Protected metadata handling</li>
+              <li>Verification before downstream use</li>
+              <li>Structured payload recovery</li>
+              <li>Cleaner security story for AI workflows</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Where this can evolve</h3>
+            <ul>
+              <li>Traceability and auditability</li>
+              <li>DICOM / biosignal / JSON adapters</li>
+              <li>Compliance-aware architecture</li>
+              <li>Institution-ready secure ingestion layers</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="use-cases">
+      <div class="container">
+        <div class="section-heading">
+          <div class="eyebrow">Use cases</div>
+          <h2>Designed for healthtech and clinical AI workflows</h2>
+          <p>
+            The same secure-ingestion idea can be adapted to multiple structured clinical and
+            biosignal environments.
+          </p>
+        </div>
+
+        <div class="cards three">
+          <article class="card">
+            <h3>ECG metadata</h3>
+            <p>Protect derived ECG metadata before handing it to tools or AI pipelines.</p>
+          </article>
+
+          <article class="card">
+            <h3>DICOM-related workflows</h3>
+            <p>Apply a protected metadata layer around structured imaging or waveform contexts.</p>
+          </article>
+
+          <article class="card">
+            <h3>Biosignal platforms</h3>
+            <p>Use the same pattern for broader biosignal, telemetry, or research metadata flows.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="positioning">
+      <div class="container">
+        <div class="section-heading">
+          <div class="eyebrow">Positioning</div>
+          <h2>What I build</h2>
+          <p>
+            Secure metadata workflows for healthtech, biosignals, and clinical AI environments.
+          </p>
+        </div>
+
+        <div class="cards two">
+          <article class="card">
+            <h3>Freelance direction</h3>
+            <p>
+              I help design and prototype secure ingestion layers for sensitive metadata workflows,
+              especially where downstream AI or tool usage requires more control.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Product direction</h3>
+            <p>
+              This MVP can evolve toward reusable secure metadata infrastructure for clinical and
+              regulated environments.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section" id="contact">
+      <div class="container cta-box">
+        <div>
+          <div class="eyebrow">Let’s talk</div>
+          <h2>Let’s build secure pipelines</h2>
+          <p>
+            Interested in secure metadata workflows for healthtech, biosignals, or clinical AI?
+            I’m open to freelance work, prototypes, and technical collaborations.
+          </p>
+        </div>
+
+        <div class="cta-actions">
+          <a class="btn btn-primary" id="contactLink" href="#">Contact me</a>
+          <a class="btn btn-secondary" id="repoLink" href="#">View repository</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <span>secure-ecg-llm-demo</span>
+      <span>Built as a secure metadata workflow MVP</span>
+    </div>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
