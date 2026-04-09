@@ -1,75 +1,84 @@
-# secure-ecg-llm-demo
+# Secure Clinical Metadata Pipeline (Rust + WASM)
 
-Rust + WebAssembly MVP for signed and encrypted ECG metadata, designed for secure LLM / tool ingestion workflows.
+A minimal, production-oriented MVP for **secure ingestion of clinical metadata**  
+designed for **AI-ready pipelines (Spark / Databricks / LLM workflows)**.
 
-## Screenshot
+---
 
-![secure-ecg-llm-demo-1](docs/secure-ecg-demo-llm_1.png)
-![secure-ecg-llm-demo-2](docs/secure-ecg-demo-llm_2.png)
-![secure-ecg-llm-demo-3](docs/secure-ecg-demo-llm_3.png)
+## 🚀 What this demo shows
 
-## Overview
+This project demonstrates a full secure flow:
 
-This project demonstrates a secure metadata handling flow for ECG-related workflows.
+1. Record metadata (ECG / DICOM / biosignals)
+2. Protect it client-side (WASM)
+   - Digital signature
+   - Encryption (AEAD)
+3. Send to backend securely
+4. Verify + decrypt server-side
+5. Validate schema + policy
+6. Store into **Bronze layer**
+7. Generate audit trail
 
-Current pipeline:
+---
 
-`ECG metadata JSON -> sign in browser -> encrypt in browser -> send to Rust backend -> verify -> decrypt -> recover structured payload`
+## 🧠 Why this matters
 
-The goal is not only to structure metadata, but to make it verifiable and secure before it enters an AI, agent, or downstream tool pipeline.
+Clinical AI pipelines require:
 
-## What this MVP demonstrates
+- Trust in data integrity  
+- Protection of patient metadata  
+- Compliance-aware ingestion  
+- Safe handoff to downstream AI systems  
 
-- browser-side signing
-- browser-side encryption
-- backend-side verification
-- backend-side decryption
-- structured payload recovery
-- Rust + WASM integration for secure metadata handling
+This MVP focuses on:
 
-## Current demo scope
+> **Record → Protect → Validate → Store → Safe for AI**
 
-This MVP works with ECG metadata JSON derived from a DICOM ECG workflow.
+---
 
-Example fields currently handled include:
+## 🏗️ Architecture
 
-- modality
-- manufacturer
-- study date
-- patient ID
-- SOP class UID
-- multiplex count
-- channel labels
-- sampling frequency
-- sample counts
+![Architecture](docs/architecture-overview.png)
 
-## Why this matters
+---
 
-Clinical and biosignal workflows often begin with files or metadata that are difficult to pass safely into downstream systems.
+## 🔐 Security Model
 
-This demo explores a lightweight secure preprocessing layer where metadata can be signed, encrypted, transmitted, verified, and recovered before entering an LLM or tool workflow.
+- Client-side protection via Rust + WASM  
+- AEAD encryption (XChaCha20Poly1305)  
+- Digital signatures (Ed25519 – placeholder for PQC)  
+- Server-side verification before ingestion  
+- Policy checks before storage  
+- Audit logging  
 
-## Architecture
+---
 
-- `frontend/` — browser UI
-- `frontend/pkg/` — generated WASM bindings
-- `rust-wasm/` — Rust WebAssembly signing + encryption module
-- `server/` — Rust backend for verification + decryption
+## 📦 Project Structure
 
-## Current flow
+frontend/ → browser demo
+rust-wasm/ → crypto (sign + encrypt)
+server/ → secure ingestion backend
+landing/ → public marketing page
+samples/ → example metadata
+docs/ → diagrams
 
-1. Load ECG metadata JSON in the browser
-2. Sign metadata in WebAssembly
-3. Encrypt metadata in WebAssembly
-4. Send protected package to Rust backend
-5. Verify signature in backend
-6. Decrypt payload in backend
-7. Return structured JSON response
 
-## Run locally
+---
 
-### 1. Build the WASM package
+## ⚙️ Run locally
+
+### 1. Start backend
 
 ```bash
-cd rust-wasm
-wasm-pack build --target web --out-dir ../frontend/pkg --release
+cd server
+cargo run --release
+
+´´´
+Backend runs on:
+
+http://127.0.0.1:8787
+
+cd frontend
+python3 -m http.server 8080
+
+http://127.0.0.1:8080
