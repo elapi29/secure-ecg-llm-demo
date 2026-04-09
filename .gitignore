@@ -1,5 +1,12 @@
-.DS_Store
 target/
-**/target/
-frontend/pkg/
-Cargo.lock
+.DS_Store
+.env
+node_modules/
+
+rust-wasm/target/
+server/target/
+
+server/storage/audit/*
+server/storage/bronze/*
+!server/storage/audit/.gitkeep
+!server/storage/bronze/.gitkeep
