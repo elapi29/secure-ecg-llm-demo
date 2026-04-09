@@ -25,14 +25,14 @@ This project demonstrates a full secure flow:
 
 Clinical AI pipelines require:
 
-- Trust in data integrity  
-- Protection of patient metadata  
-- Compliance-aware ingestion  
-- Safe handoff to downstream AI systems  
+- Trust in data integrity
+- Protection of patient metadata
+- Compliance-aware ingestion
+- Safe handoff to downstream AI systems
 
 This MVP focuses on:
 
-> **Record → Protect → Validate → Store → Safe for AI**
+> Record → Protect → Validate → Store → Safe for AI
 
 ---
 
@@ -44,41 +44,22 @@ This MVP focuses on:
 
 ## 🔐 Security Model
 
-- Client-side protection via Rust + WASM  
-- AEAD encryption (XChaCha20Poly1305)  
-- Digital signatures (Ed25519 – placeholder for PQC)  
-- Server-side verification before ingestion  
-- Policy checks before storage  
-- Audit logging  
+- Client-side protection via Rust + WASM
+- AEAD encryption (XChaCha20Poly1305)
+- Digital signatures (Ed25519 — placeholder for PQC)
+- Server-side verification before ingestion
+- Policy checks before storage
+- Audit logging
 
 ---
 
 ## 📦 Project Structure
 
-frontend/ → browser demo
-rust-wasm/ → crypto (sign + encrypt)
-server/ → secure ingestion backend
-landing/ → public marketing page
-samples/ → example metadata
-docs/ → diagrams
+```text
+frontend/   -> browser demo
+rust-wasm/  -> crypto (sign + encrypt)
+server/     -> secure ingestion backend
+landing/    -> public marketing page
+samples/    -> example metadata
+docs/       -> diagrams
 
-
----
-
-## ⚙️ Run locally
-
-### 1. Start backend
-
-```bash
-cd server
-cargo run --release
-
-´´´
-Backend runs on:
-
-http://127.0.0.1:8787
-
-cd frontend
-python3 -m http.server 8080
-
-http://127.0.0.1:8080
